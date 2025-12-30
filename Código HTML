@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Benefícios - Fábrica XYZ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .chat-container { width: 90%; max-width: 500px; height: 80vh; background: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .chat-header { background: #007bff; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #fafafa; }
+        .message { margin-bottom: 15px; display: flex; }
+        .bot { justify-content: flex-start; }
+        .user { justify-content: flex-end; }
+        .message-content { max-width: 70%; padding: 10px 15px; border-radius: 20px; }
+        .bot .message-content { background: #e9ecef; }
+        .user .message-content { background: #007bff; color: white; }
+        .chat-input { display: flex; padding: 20px; background: white; border-radius: 0 0 10px 10px; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+        button { margin-left: 10px; padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 25px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .typing { font-style: italic; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>🤖 Assistente de Benefícios</h2>
+            <p>Olá! Pergunte sobre seus benefícios. Ex: "Qual o plano de saúde?"</p>
+        </div>
+        <div class="chat-messages" id="messages">
+            <div class="message bot">
+                <div class="message-content">Olá, colaborador! Estou aqui para tirar dúvidas sobre benefícios. Digite sua pergunta!</div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Digite sua dúvida..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const responses = {
+            'saúde': 'Nosso plano de saúde cobre consultas, internações e medicamentos. Cobertura a partir do 1º mês. Contate RH para adesão.',
+            'alimentação': 'Vale-alimentação: R$ 600/mês. Usado em supermercados e restaurantes credenciados.',
+            'transporte': 'Vale-transporte cobre 100% do trajeto casa-trabalho. Cadastre seu endereço no RH.',
+            'férias': '30 dias de férias remuneradas após 12 meses. Agende com seu supervisor.',
+            '13º': '13º salário integral, pago em duas parcelas (nov/dez).',
+            'seguro': 'Seguro de vida com cobertura de R$ 50.000 em caso de falecimento.',
+            'default': 'Desculpe, não entendi. Pergunte sobre: saúde, alimentação, transporte, férias, 13º ou seguro. Ou contate o RH!'
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim().toLowerCase();
+            if (!message) return;
+
+            addMessage('user', input.value);
+            input.value = '';
+
+            setTimeout(() => {
+                addTyping();
+                setTimeout(() => {
+                    removeTyping();
+                    const keys = Object.keys(responses);
+                    const responseKey = keys.find(key => message.includes(key)) || 'default';
+                    addMessage('bot', responses[responseKey]);
+                }, 1000);
+            }, 500);
+        }
+
+        function addMessage(sender, text) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addTyping() {
+            const messages = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.innerHTML = '<div class="message-content typing">Digitando...</div>';
+            messages.appendChild(typingDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const messages = document.getElementById('messages');
+            const lastChild = messages.lastElementChild;
+            if (lastChild && lastChild.querySelector('.typing')) {
+                messages.removeChild(lastChild);
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+    </script>
+</body>
+</html>
